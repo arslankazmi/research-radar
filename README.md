@@ -52,6 +52,41 @@ Reactions are captured via OpenClaw's `message_received` hook and persisted to y
 
 ## How it works
 
+```mermaid
+flowchart TD
+    trigger["cron · /radar · radar_run"] --> reg["buildAdapters<br/>src/sources/registry.ts"]
+    reg --> fetch["fetchAll — parallel<br/>Promise.allSettled · failures isolated"]
+    fetch --> sources
+
+    subgraph sources["Source adapters · src/sources/"]
+      direction LR
+      arxiv["arXiv"]:::paper
+      hf["Hugging Face"]:::model
+      gh["GitHub trending"]:::repo
+      hn["Hacker News"]:::post
+      rss["RSS / Atom"]:::post
+      scrape["scrape fallback"]:::post
+    end
+
+    sources --> items["Item[]"] --> dedup["dedupe<br/>src/judge/dedup.ts"]
+    dedup --> judge{"scoreItems — LLM-as-judge<br/>src/judge/judge.ts"}
+    profile[("InterestProfile<br/>src/profile/")] --> judge
+    judge -->|llm ok| scored["ScoredItem[]"]
+    judge -->|no key / parse fail| kw["keyword fallback"] --> scored
+    scored --> compose["compose · renderMarkdown · Canvas card<br/>src/digest/compose.ts"]
+    compose --> deliver["deliver to your channel"] --> user((you))
+    user -->|👍 · 👎 · mute| hook["message_received hook<br/>applyReaction · src/feedback/"]
+    hook --> profile
+    eval["precision@k self-eval<br/>src/eval/precision.ts"] -. audits .-> judge
+
+    classDef paper fill:#1f6feb33,stroke:#1f6feb;
+    classDef model fill:#fbbf2433,stroke:#fbbf24;
+    classDef repo fill:#34d39933,stroke:#34d399;
+    classDef post fill:#a78bfa33,stroke:#a78bfa;
+```
+
+<details><summary>Same flow as plain text</summary>
+
 ```
 cron / "/radar"
       │
@@ -66,6 +101,10 @@ cron / "/radar"
                                                                                      │
                                           profile ◄── applyReaction ◄── 👍/👎/mute ◄─┘
 ```
+
+</details>
+
+📖 **[Full docs & self-demoing page →](https://arslankazmi.github.io/research-radar/)**
 
 The **core pipeline is pure TypeScript with zero SDK dependency** — every unit is dependency-injected and
 unit-tested. A thin entry (`src/plugin/index.ts`) wires it to the OpenClaw plugin API.

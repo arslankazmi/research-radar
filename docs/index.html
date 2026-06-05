@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Research Radar — an OpenClaw plugin</title>
+<meta name="description" content="A conversational, multi-source ML research radar for OpenClaw. LLM-judged relevance that learns from your in-chat 👍/👎." />
+<style>
+  :root {
+    --bg:#0b0f14; --panel:#121821; --panel2:#0f141c; --line:#1f2733;
+    --text:#d7dde5; --muted:#8b97a7; --dim:#5c6675;
+    --cyan:#38bdf8; --green:#34d399; --blue:#1f6feb; --amber:#fbbf24; --purple:#a78bfa; --pink:#f472b6;
+    --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.6; -webkit-font-smoothing:antialiased; }
+  a { color:var(--cyan); text-decoration:none; } a:hover { text-decoration:underline; }
+  .wrap { max-width:980px; margin:0 auto; padding:0 22px; }
+  section { padding:54px 0; border-top:1px solid var(--line); }
+  h1,h2,h3 { line-height:1.25; margin:0 0 .5em; }
+  h2 { font-size:1.5rem; letter-spacing:-.01em; }
+  h2 .num { color:var(--cyan); font-family:var(--mono); font-size:1rem; margin-right:.5em; opacity:.8; }
+  h3 { font-size:1.05rem; }
+  p { color:#c2cad6; }
+  code { font-family:var(--mono); font-size:.86em; background:#0e141d; border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:#cfe8ff; }
+  .muted { color:var(--muted); } .dim { color:var(--dim); }
+
+  /* hero */
+  .hero { padding:70px 0 46px; border-top:none; text-align:center; background:
+     radial-gradient(900px 360px at 50% -120px, rgba(56,189,248,.16), transparent 70%); }
+  .radar { width:60px;height:60px;margin:0 auto 14px;border-radius:50%;
+     background:radial-gradient(circle, rgba(56,189,248,.25), transparent 65%);
+     border:1px solid #2a3a4d; position:relative; }
+  .radar::before,.radar::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid #213040;}
+  .radar::before{inset:12px;} .radar i{position:absolute;top:50%;left:50%;width:50%;height:1px;
+     background:linear-gradient(90deg,var(--cyan),transparent);transform-origin:left center;animation:sweep 3.2s linear infinite;}
+  @keyframes sweep{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion:reduce){.radar i{animation:none;}}
+  .hero h1 { font-size:2.5rem; letter-spacing:-.02em; margin-bottom:.2em; }
+  .hero .tag { color:var(--muted); font-size:1.12rem; max-width:660px; margin:0 auto 8px; }
+  .hero .pills { color:var(--dim); font-family:var(--mono); font-size:.82rem; margin-top:6px; }
+  .cta { margin-top:24px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { display:inline-block; padding:9px 16px; border-radius:9px; font-weight:600; font-size:.92rem; border:1px solid var(--line); }
+  .btn.primary { background:var(--cyan); color:#04222f; border-color:var(--cyan); }
+  .btn.ghost { color:var(--text); }
+
+  /* badges */
+  .badges { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:30px; }
+  .badge { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 16px; min-width:118px; text-align:center; }
+  .badge b { display:block; font-size:1.5rem; font-family:var(--mono); color:#fff; line-height:1.1; }
+  .badge span { font-size:.74rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+
+  /* cards */
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px 18px 16px; }
+  .card h3 { margin-top:0; } .card p { font-size:.92rem; margin:.3em 0 0; color:#aeb8c6; }
+  .card .ic { font-size:1.4rem; }
+  .decision .why { margin-top:10px; font-size:.86rem; color:var(--muted); border-left:2px solid var(--line); padding-left:10px; }
+  .decision .why b { color:var(--amber); font-weight:600; }
+
+  /* mermaid */
+  .diagram { background:var(--panel2); border:1px solid var(--line); border-radius:14px; padding:14px; overflow:auto; }
+  .mermaid { text-align:center; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:.8rem; color:var(--muted); }
+  .legend i { display:inline-block; width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:middle; }
+
+  /* terminal */
+  .term { background:#080c11; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin:0; }
+  .term .bar { background:#0e141d; padding:8px 12px; border-bottom:1px solid var(--line); font-family:var(--mono); font-size:.74rem; color:var(--dim); display:flex; align-items:center; gap:6px; }
+  .dot { width:11px;height:11px;border-radius:50%; display:inline-block; }
+  .dot.r{background:#ff5f56;} .dot.y{background:#ffbd2e;} .dot.g{background:#27c93f;}
+  .term .bar .ttl { margin-left:8px; }
+  .term pre { margin:0; padding:14px 16px; overflow:auto; font-family:var(--mono); font-size:.82rem; line-height:1.55; color:#cdd6e0; }
+  .term .c-info{color:#6ea8d8;} .term .c-warn{color:var(--amber);} .term .c-ok{color:var(--green);}
+  .term .c-h{color:#fff;font-weight:600;} .term .c-mut{color:var(--dim);} .term .c-acc{color:var(--cyan);}
+
+  /* trace */
+  ol.trace { counter-reset:step; list-style:none; padding:0; margin:0; }
+  ol.trace li { position:relative; padding:0 0 18px 44px; border-left:1px solid var(--line); margin-left:14px; }
+  ol.trace li:last-child { border-left:1px solid transparent; }
+  ol.trace li::before { counter-increment:step; content:counter(step); position:absolute; left:-15px; top:-2px;
+     width:30px;height:30px;border-radius:50%; background:var(--panel); border:1px solid var(--cyan); color:var(--cyan);
+     font-family:var(--mono); font-size:.85rem; display:flex; align-items:center; justify-content:center; }
+  ol.trace li h3 { margin:.1em 0 .2em; font-size:.98rem; }
+  ol.trace li p { margin:0; font-size:.9rem; color:#aeb8c6; }
+
+  /* tree */
+  .tree { background:var(--panel2); border:1px solid var(--line); border-radius:12px; padding:16px 18px; font-family:var(--mono); font-size:.82rem; line-height:1.7; overflow:auto; }
+  .tree .d { color:var(--cyan); } .tree .ann { color:var(--dim); }
+  .tree .star { color:var(--amber); }
+
+  /* chat gallery */
+  .chat { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; }
+  .msg { max-width:86%; margin:8px 0; padding:9px 13px; border-radius:14px; font-size:.9rem; white-space:pre-wrap; }
+  .msg.you { margin-left:auto; background:#15324a; border:1px solid #1d4a6b; color:#dff0ff; border-bottom-right-radius:4px; }
+  .msg.bot { background:#0f151d; border:1px solid var(--line); border-bottom-left-radius:4px; }
+  .msg .lbl { display:block; font-size:.68rem; color:var(--dim); margin-bottom:3px; font-family:var(--mono); }
+  .msg b { color:#fff; }
+
+  footer { border-top:1px solid var(--line); padding:34px 0 60px; color:var(--muted); font-size:.85rem; }
+  .foot-grid { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+  .disclaimer { margin-top:16px; font-size:.78rem; color:var(--dim); border:1px dashed var(--line); border-radius:10px; padding:12px 14px; }
+  ::selection { background:rgba(56,189,248,.3); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="radar"><i></i></div>
+    <h1>Research&nbsp;Radar</h1>
+    <p class="tag">A conversational, multi-source ML research radar for <a href="https://github.com/openclaw/openclaw">OpenClaw</a> — LLM-judged relevance that <b>learns from your in-chat&nbsp;👍/👎</b>.</p>
+    <p class="pills">📄 papers · 🤗 models · 🛠️ repos · 📝 posts — ranked for you, in the chat you already use</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/arslankazmi/research-radar">View on GitHub</a>
+      <a class="btn ghost" href="#architecture">How it works</a>
+      <a class="btn ghost" href="#gallery">See it run</a>
+    </div>
+    <div class="badges">
+      <div class="badge"><b>7</b><span>agent tools</span></div>
+      <div class="badge"><b>121</b><span>tests passing</span></div>
+      <div class="badge"><b>6</b><span>source kinds</span></div>
+      <div class="badge"><b>0</b><span>SDK deps in core</span></div>
+      <div class="badge"><b>TS</b><span>Node ≥ 22.19</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- WHAT IT DOES -->
+<section id="what">
+  <div class="wrap">
+    <h2><span class="num">01</span>What it does</h2>
+    <p>Every "arXiv digest" tool is a <em>one-way email</em>, arXiv-only, ranked against a profile you set once. Running inside OpenClaw — an always-on, multi-channel assistant — lets the radar do what an inbox can't.</p>
+    <div class="grid">
+      <div class="card"><div class="ic">💬</div><h3>It's a conversation</h3><p>The digest lands as a numbered thread you interrogate: <code>summarize #3</code>, <code>why #5</code>, <code>more like #2</code>, <code>mute KV-cache</code>.</p></div>
+      <div class="card"><div class="ic">🛰️</div><h3>It's multi-source</h3><p>Papers <em>and</em> model releases <em>and</em> trending repos <em>and</em> curated researcher blogs — one adapter per source, RSS-preferred with a scrape fallback.</p></div>
+      <div class="card"><div class="ic">🧠</div><h3>It learns</h3><p>Your 👍/👎 become few-shot exemplars that re-tune the relevance judge over time. Quality is measurable — it ships a <b>precision@k</b> self-eval.</p></div>
+      <div class="card"><div class="ic">🛡️</div><h3>It never falls over</h3><p>Per-source failure isolation: one dead feed never sinks the digest. No model/key? A keyword scorer still produces one.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="wrap">
+    <h2><span class="num">02</span>Architecture</h2>
+    <p>The core pipeline is <b>pure TypeScript with zero SDK dependency</b> — every unit is dependency-injected and unit-tested. A thin entry (<code>src/plugin/index.ts</code>) wires it to the OpenClaw plugin API.</p>
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart TD
+    trigger["cron · /radar · radar_run"] --> reg["buildAdapters<br/>src/sources/registry.ts"]
+    reg --> fetch["fetchAll — parallel<br/>Promise.allSettled · failures isolated"]
+    fetch --> sources
+
+    subgraph sources["Source adapters · src/sources/"]
+      direction LR
+      arxiv["arXiv"]:::paper
+      hf["Hugging Face"]:::model
+      gh["GitHub trending"]:::repo
+      hn["Hacker News"]:::post
+      rss["RSS / Atom"]:::post
+      scrape["scrape fallback"]:::post
+    end
+
+    sources --> items["Item[]"] --> dedup["dedupe<br/>src/judge/dedup.ts"]
+    dedup --> judge{"scoreItems — LLM-as-judge<br/>src/judge/judge.ts"}
+    profile[("InterestProfile<br/>src/profile/")] --> judge
+    judge -->|llm ok| scored["ScoredItem[]"]
+    judge -->|no key / parse fail| kw["keyword fallback"] --> scored
+    scored --> compose["compose · renderMarkdown · Canvas card<br/>src/digest/compose.ts"]
+    compose --> deliver["deliver to your channel"] --> user((you))
+    user -->|👍 · 👎 · mute| hook["message_received hook<br/>applyReaction · src/feedback/"]
+    hook --> profile
+    eval["precision@k self-eval<br/>src/eval/precision.ts"] -. audits .-> judge
+
+    classDef paper fill:#1f6feb33,stroke:#1f6feb,color:#dbe9ff;
+    classDef model fill:#fbbf2433,stroke:#fbbf24,color:#fff3d6;
+    classDef repo fill:#34d39933,stroke:#34d399,color:#d6fff0;
+    classDef post fill:#a78bfa33,stroke:#a78bfa,color:#ece4ff;
+      </pre>
+    </div>
+    <div class="legend">
+      <span><i style="background:#1f6feb"></i>paper</span>
+      <span><i style="background:#fbbf24"></i>model</span>
+      <span><i style="background:#34d399"></i>repo</span>
+      <span><i style="background:#a78bfa"></i>post</span>
+    </div>
+  </div>
+</section>
+
+<!-- TRACE -->
+<section id="trace">
+  <div class="wrap">
+    <h2><span class="num">03</span>One request, end to end</h2>
+    <p>What actually happens on <code>/radar</code> (field and file names are the real ones):</p>
+    <ol class="trace">
+      <li><h3><code>buildAdapters(config.sources)</code></h3><p>The registry instantiates one <code>SourceAdapter</code> per configured source (arXiv cs.LG/CL/CV, HF trending, GitHub ML, Hacker News, the RSS/scrape researcher feeds).</p></li>
+      <li><h3><code>fetchAll()</code> — parallel</h3><p><code>Promise.allSettled</code> runs every adapter at once; a rejected source logs a warning and contributes <code>[]</code>. Each returns normalized <code>Item[]</code> with a <code>stableId</code> from the canonical URL.</p></li>
+      <li><h3><code>dedupe(items)</code></h3><p>Collapses exact-id duplicates, then near-duplicate titles (token Jaccard ≥ 0.9), keeping the richer summary.</p></li>
+      <li><h3><code>scoreItems(items, profile, { llm })</code></h3><p>One batched prompt — interest text + 👍/👎 few-shot exemplars + numbered candidates → strict JSON <code>[{id, score, reason}]</code> from the agent's configured model. Muted topics forced to 0. On any failure: keyword fallback, <code>scorer:"keyword"</code>.</p></li>
+      <li><h3><code>compose(scored, profile)</code></h3><p>Threshold by <code>minScore</code>, sort by score, take <code>topN</code>, group by <code>sourceType</code> → <code>renderMarkdown</code> (the numbered <code>#N</code> list) + a Canvas card object.</p></li>
+      <li><h3>deliver → react → <code>applyReaction</code></h3><p>The digest posts to your channel. A 👍/👎/<code>mute</code> reply hits the <code>message_received</code> hook, appends an exemplar (or muted topic) to the profile, and the next run ranks a little more like you.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- DECISIONS -->
+<section id="decisions">
+  <div class="wrap">
+    <h2><span class="num">04</span>Decisions &amp; war stories</h2>
+    <div class="grid">
+      <div class="card decision"><h3>Pure core + thin entry + type shim</h3><p>All logic depends only on ports we own; one thin file touches the SDK.</p><div class="why"><b>Why:</b> <code>@openclaw/plugin-sdk</code> is <code>private:true</code> — <b>not on npm</b>; clawhub bundles it at publish. A naïve all-SDK plugin can't even compile locally. The shim (<code>src/plugin/sdk.d.ts</code>) satisfies <code>tsc</code> without it.</div></div>
+      <div class="card decision"><h3>Cron with a fallback</h3><p>Attempt native <code>scheduleSessionTurn</code>; otherwise instruct the agent to schedule via the built-in <code>cron</code> tool.</p><div class="why"><b>Why:</b> <code>scheduleSessionTurn</code> is <b>bundled-only</b> and absent for external plugins — discovered by reading the SDK runtime types, not the happy-path docs.</div></div>
+      <div class="card decision"><h3>RSS-preferred, scrape fallback</h3><p>Feedless sites route through a scrape adapter.</p><div class="why"><b>Why:</b> the "obvious" feeds don't exist — <b>gwern.net and Anthropic publish no RSS</b>, and Karpathy moved to Bearblog. Guessed URLs would have silently returned nothing.</div></div>
+      <div class="card decision"><h3>LLM-as-judge ⟂ keyword fallback</h3><p>The judge degrades to keyword overlap, never to an empty digest.</p><div class="why"><b>Why:</b> availability &gt; peak quality for a daily habit. A missing key or a garbled JSON response should still ship something useful.</div></div>
+      <div class="card decision"><h3>precision@k self-eval</h3><p><code>runGoldenEval</code> scores the ranker against a labeled set.</p><div class="why"><b>Why:</b> a ranker you can't measure is a vibe. It also exposes the recall blind spot — misses hide <em>upstream</em> of the judge, at the fetch stage.</div></div>
+      <div class="card decision"><h3>Dependency-injected everything</h3><p><code>HttpClient</code>, <code>Llm</code>, <code>KvStore</code>, <code>Logger</code> are ports.</p><div class="why"><b>Why:</b> the whole pipeline runs offline against fixtures — 121 tests and a <code>--dry-run</code> with no network, no key, no OpenClaw runtime.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TREE -->
+<section id="layout">
+  <div class="wrap">
+    <h2><span class="num">05</span>Code layout</h2>
+    <div class="tree"><span class="dim">research-radar/</span>
+├─ <span class="d">src/</span>
+│  ├─ types.ts · contracts.ts        <span class="ann"># shared domain types + DI ports</span>
+│  ├─ <span class="d">sources/</span>                       <span class="ann"># arxiv · huggingface · github-trending · hackernews · rss · scrape + registry</span>
+│  ├─ <span class="d">judge/</span>  judge.ts · dedup.ts     <span class="star"># LLM-as-judge relevance + dedup</span>
+│  ├─ <span class="d">profile/</span> profile.ts            <span class="ann"># interest profile (interests, keywords, exemplars, mutes)</span>
+│  ├─ <span class="d">feedback/</span> feedback.ts          <span class="star"># 👍/👎/mute → profile (the learning loop)</span>
+│  ├─ <span class="d">eval/</span> precision.ts            <span class="star"># precision@k self-eval</span>
+│  ├─ <span class="d">digest/</span> compose.ts            <span class="ann"># threshold/group + renderMarkdown + Canvas card</span>
+│  ├─ pipeline.ts                    <span class="ann"># runRadar — the heart (pure, injectable)</span>
+│  ├─ <span class="d">runtime/</span>                      <span class="ann"># node-http · fs-kv · offline-http · openai-llm</span>
+│  ├─ <span class="d">plugin/</span> index.ts · sdk.d.ts   <span class="ann"># thin OpenClaw entry + dev-only type shim</span>
+│  └─ cli.ts                         <span class="ann"># --dry-run --offline verification surface</span>
+├─ <span class="d">test/</span>  sources/ · intelligence/ · assembly/ · fixtures/   <span class="ann"># 121 vitest tests</span>
+├─ <span class="d">docs/</span>  OPENCLAW_PLUGIN_SDK.md · LOCAL_TESTING.md · index.html
+├─ openclaw.plugin.json             <span class="ann"># tool contracts + config schema</span>
+└─ SKILL.md · README.md
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="wrap">
+    <h2><span class="num">06</span>See it run</h2>
+    <p>Real output — captured from <code>npm run dry-run -- --offline</code> and <code>npm test</code>, no edits.</p>
+
+    <h3 style="margin-top:22px">The pipeline, offline, end to end</h3>
+    <div class="term"><span class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">npm run dry-run -- --offline</span></span><pre><span class="c-info">[radar] dry-run mode: using subset of sources</span>
+<span class="c-info">[radar] Fetched 9 raw items from 4 source(s)</span>
+<span class="c-info">[radar] After dedup: 9 items</span>
+<span class="c-warn">[radar:warn] scoreItems: no llm provided, using keyword fallback</span>
+<span class="c-info">[radar] Scored 9 items</span>
+<span class="c-info">[radar] Digest composed: 3 items across 2 group(s)</span>
+
+<span class="c-h">## Research Radar — 2026-06-05</span>
+<span class="c-mut">_9 items considered, 3 selected_</span>
+
+<span class="c-h">### 📄 Papers</span>
+<span class="c-h">#1</span> <span class="c-h">Scaling Laws for Large Language Model Fine-Tuning</span>
+   <span class="c-mut">Matched terms: large, language, fine, tuning, models · arxiv-cs-lg</span>
+<span class="c-h">#2</span> <span class="c-h">RLHF from Human Feedback: A Survey of Alignment Techniques</span>
+   <span class="c-mut">Matched terms: rlhf, alignment, learning, language, models · arxiv-cs-lg</span>
+
+<span class="c-h">### 📝 Posts</span>
+<span class="c-h">#3</span> <span class="c-h">The Unreasonable Effectiveness of Fine-tuning Small Models</span>
+   <span class="c-mut">Matched terms: fine, tuning, models · hackernews-ml</span>
+
+<span class="c-mut">─────────────────────────────────────────────</span>
+<span class="c-acc">React 👍/👎 on any #N, or say `more like #N`, `mute &lt;topic&gt;`, `/radar` to refresh.</span></pre></div>
+
+    <h3 style="margin-top:26px">Full suite — pure core, no runtime needed</h3>
+    <div class="term"><span class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">npm test</span></span><pre> <span class="c-ok">✓</span> test/assembly/compose.test.ts        <span class="c-mut">(14 tests)</span>
+ <span class="c-ok">✓</span> test/assembly/pipeline.test.ts       <span class="c-mut">(8 tests)</span>
+ <span class="c-ok">✓</span> test/intelligence/intelligence.test.ts <span class="c-mut">(34 tests)</span>
+ <span class="c-ok">✓</span> test/sources/arxiv.test.ts           <span class="c-mut">(6 tests)</span>
+ <span class="c-ok">✓</span> test/sources/huggingface.test.ts     <span class="c-mut">(8 tests)</span>
+ <span class="c-ok">✓</span> test/sources/github-trending.test.ts <span class="c-mut">(8 tests)</span>
+ <span class="c-ok">✓</span> test/sources/hackernews.test.ts      <span class="c-mut">(9 tests)</span>
+ <span class="c-ok">✓</span> test/sources/rss.test.ts             <span class="c-mut">(14 tests)</span>
+ <span class="c-ok">✓</span> test/sources/scrape.test.ts          <span class="c-mut">(9 tests)</span>
+ <span class="c-ok">✓</span> test/sources/registry.test.ts        <span class="c-mut">(11 tests)</span>
+
+ <span class="c-ok">Test Files  10 passed (10)</span>
+ <span class="c-ok">     Tests  121 passed (121)</span></pre></div>
+
+    <h3 style="margin-top:26px">In the chat — the learning loop</h3>
+    <div class="chat">
+      <div class="msg you"><span class="lbl">you · telegram</span>/radar</div>
+      <div class="msg bot"><span class="lbl">openclaw · research-radar</span><b>📄 #1</b> Scaling Laws for LLM Fine-Tuning — <i>directly on your fine-tuning interest</i>
+<b>📄 #2</b> RLHF: A Survey of Alignment Techniques
+<b>📝 #3</b> The Unreasonable Effectiveness of Fine-tuning Small Models
+<span style="color:#5c6675">react 👍/👎 · "why #1" · "more like #2" · "mute &lt;topic&gt;"</span></div>
+      <div class="msg you"><span class="lbl">you</span>why #1</div>
+      <div class="msg bot"><span class="lbl">openclaw</span>It scored 9/10: matches your stated interest in <b>fine-tuning &amp; eval</b>, and is close to a paper you 👍'd last week.</div>
+      <div class="msg you"><span class="lbl">you</span>👍 more like #1 — and mute reinforcement-learning theory</div>
+      <div class="msg bot"><span class="lbl">openclaw</span>Noted 👍 — added a positive exemplar and muted <i>reinforcement-learning theory</i>. Tomorrow's digest will lean accordingly.</div>
+    </div>
+    <p class="dim" style="margin-top:10px;font-size:.8rem">Chat panel illustrates the live behaviour wired in <code>src/plugin/index.ts</code> (tools + <code>message_received</code> hook); terminal blocks above are verbatim command output.</p>
+  </div>
+</section>
+
+<!-- QUICKSTART -->
+<section id="quickstart">
+  <div class="wrap">
+    <h2><span class="num">07</span>Quickstart</h2>
+    <h3>Try the pipeline locally (no OpenClaw, no key)</h3>
+    <div class="term"><span class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">bash</span></span><pre>git clone https://github.com/arslankazmi/research-radar.git
+cd research-radar &amp;&amp; npm install
+npm test                       <span class="c-mut"># 121 tests</span>
+npm run dry-run -- --offline   <span class="c-mut"># render a digest from fixtures</span></pre></div>
+    <h3 style="margin-top:22px">Install into a deployed OpenClaw instance</h3>
+    <div class="term"><span class="bar"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span class="ttl">bash</span></span><pre>npm install                              <span class="c-mut"># OpenClaw never installs plugin deps</span>
+openclaw plugins install --link "$(pwd)" <span class="c-mut"># TS entry runs via jiti — no build</span>
+openclaw gateway restart
+openclaw plugins inspect research-radar --runtime --json</pre></div>
+    <p class="muted">Then allow the optional tools with <code>{"tools":{"allow":["research-radar"]}}</code> in <code>~/.openclaw/openclaw.json</code>. Full walkthrough: <a href="https://github.com/arslankazmi/research-radar/blob/main/docs/LOCAL_TESTING.md">docs/LOCAL_TESTING.md</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div><b>Research Radar</b> · MIT © Arslan Kazmi<br><span class="dim">An OpenClaw plugin — papers, models, repos &amp; posts, ranked for you.</span></div>
+      <div>
+        <a href="https://github.com/arslankazmi/research-radar">GitHub</a> ·
+        <a href="https://github.com/openclaw/openclaw">OpenClaw</a> ·
+        <a href="https://github.com/arslankazmi/research-radar/blob/main/docs/LOCAL_TESTING.md">Local testing</a>
+      </div>
+    </div>
+    <div class="disclaimer">Independent, unofficial plugin — not affiliated with or endorsed by OpenClaw or any listed source (arXiv, Hugging Face, GitHub, Hacker News, or the researcher blogs). Diagram and traces are generated from the real codebase; the chat panel is an illustration of wired behaviour.</div>
+  </div>
+</footer>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad:true, theme:"dark", securityLevel:"loose",
+    themeVariables:{ fontFamily:"SFMono-Regular,ui-monospace,monospace", fontSize:"14px",
+      background:"#0f141c", primaryColor:"#121821", primaryBorderColor:"#2a3a4d",
+      primaryTextColor:"#d7dde5", lineColor:"#4b5b6e", clusterBkg:"#0c1118", clusterBorder:"#22303f" } });
+</script>
+</body>
+</html>
