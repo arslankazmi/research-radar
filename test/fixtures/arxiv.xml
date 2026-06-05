@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ArXiv Query: search_query=cat:cs.LG</title>
+  <id>http://arxiv.org/api/query?search_query=cat:cs.LG&amp;max_results=3</id>
+  <updated>2025-01-15T00:00:00-05:00</updated>
+  <entry>
+    <id>http://arxiv.org/abs/2501.00001v1</id>
+    <updated>2025-01-15T00:00:00-05:00</updated>
+    <published>2025-01-14T18:00:00-05:00</published>
+    <title>Scaling Laws for Neural Language Models Revisited</title>
+    <summary>We revisit scaling laws for large language models and find that compute-optimal training requires larger models than previously thought. Our experiments across multiple model families confirm a new set of scaling coefficients.</summary>
+    <author><name>Alice Smith</name></author>
+    <author><name>Bob Jones</name></author>
+    <link href="http://arxiv.org/abs/2501.00001v1" rel="related"/>
+    <link href="http://arxiv.org/abs/2501.00001v1" rel="alternate" type="text/html"/>
+    <link href="http://arxiv.org/pdf/2501.00001v1" rel="related" type="application/pdf"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2501.00002v1</id>
+    <updated>2025-01-14T00:00:00-05:00</updated>
+    <published>2025-01-13T18:00:00-05:00</published>
+    <title>Efficient Fine-Tuning of Vision Transformers via Low-Rank Adaptation</title>
+    <summary>We propose ViT-LoRA, a parameter-efficient method for fine-tuning vision transformers that achieves competitive performance with full fine-tuning using only 0.5% of trainable parameters.</summary>
+    <author><name>Carol Lee</name></author>
+    <link href="http://arxiv.org/abs/2501.00002v1" rel="alternate" type="text/html"/>
+    <link href="http://arxiv.org/pdf/2501.00002v1" rel="related" type="application/pdf"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2501.00003v1</id>
+    <updated>2025-01-13T00:00:00-05:00</updated>
+    <published>2025-01-12T18:00:00-05:00</published>
+    <title>Mixture of Experts for Efficient Inference at Scale</title>
+    <summary>This paper presents a novel routing mechanism for sparse mixture-of-experts models that reduces inference cost by 3x while maintaining model quality on standard benchmarks.</summary>
+    <author><name>David Wang</name></author>
+    <author><name>Eve Chen</name></author>
+    <link href="http://arxiv.org/abs/2501.00003v1" rel="alternate" type="text/html"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+  </entry>
+</feed>

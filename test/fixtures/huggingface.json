@@ -1,0 +1,42 @@
+[
+  {
+    "id": "mistralai/Mistral-7B-v0.1",
+    "modelId": "mistralai/Mistral-7B-v0.1",
+    "createdAt": "2023-09-27T12:00:00.000Z",
+    "lastModified": "2024-01-10T08:00:00.000Z",
+    "downloads": 5000000,
+    "likes": 12000,
+    "trendingScore": 98.5,
+    "pipeline_tag": "text-generation",
+    "tags": ["pytorch", "mistral", "causal-lm", "transformers"],
+    "cardData": {
+      "summary": "Mistral 7B is a 7-billion parameter language model released by Mistral AI. It outperforms Llama 2 13B on all benchmarks."
+    }
+  },
+  {
+    "id": "stabilityai/stable-diffusion-xl-base-1.0",
+    "modelId": "stabilityai/stable-diffusion-xl-base-1.0",
+    "createdAt": "2023-07-26T10:00:00.000Z",
+    "lastModified": "2024-01-05T12:00:00.000Z",
+    "downloads": 3000000,
+    "likes": 8500,
+    "trendingScore": 87.2,
+    "pipeline_tag": "text-to-image",
+    "tags": ["diffusers", "stable-diffusion-xl", "text-to-image"],
+    "cardData": {
+      "summary": "SDXL 1.0 is the latest version of Stable Diffusion, featuring improved image generation quality."
+    }
+  },
+  {
+    "id": "meta-llama/Llama-2-7b-hf",
+    "modelId": "meta-llama/Llama-2-7b-hf",
+    "createdAt": "2023-07-18T14:00:00.000Z",
+    "lastModified": "2023-12-01T10:00:00.000Z",
+    "downloads": 8000000,
+    "likes": 15000,
+    "trendingScore": 75.3,
+    "pipeline_tag": "text-generation",
+    "tags": ["pytorch", "llama", "causal-lm"],
+    "cardData": {}
+  }
+]

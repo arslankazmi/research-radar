@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Anthropic Research Blog</title>
+  <link href="https://www.anthropic.com/research" rel="self"/>
+  <id>https://www.anthropic.com/research</id>
+  <updated>2025-01-15T00:00:00Z</updated>
+  <entry>
+    <title>Constitutional AI: Harmlessness from AI Feedback</title>
+    <link href="https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback" rel="alternate"/>
+    <id>https://www.anthropic.com/research/constitutional-ai-harmlessness-from-ai-feedback</id>
+    <published>2022-12-15T00:00:00Z</published>
+    <updated>2022-12-15T00:00:00Z</updated>
+    <summary>We introduce a method for training AI systems to be helpful, harmless, and honest using a constitution of principles and AI-generated feedback.</summary>
+    <author><name>Anthropic Research Team</name></author>
+  </entry>
+  <entry>
+    <title>Claude: A Large Language Model for Responsible AI</title>
+    <link href="https://www.anthropic.com/research/claude-model-card" rel="alternate"/>
+    <id>https://www.anthropic.com/research/claude-model-card</id>
+    <published>2023-03-14T00:00:00Z</published>
+    <updated>2023-03-14T00:00:00Z</updated>
+    <summary>We present Claude, a large language model trained using reinforcement learning from human feedback and constitutional AI techniques.</summary>
+    <author><name>Anthropic Research Team</name></author>
+  </entry>
+  <entry>
+    <title>Scaling Monosemanticity: Extracting Interpretable Features from Claude</title>
+    <link href="https://www.anthropic.com/research/scaling-monosemanticity-extracting-interpretable-features" rel="alternate"/>
+    <id>https://www.anthropic.com/research/scaling-monosemanticity-extracting-interpretable-features</id>
+    <published>2024-05-21T00:00:00Z</published>
+    <updated>2024-05-21T00:00:00Z</updated>
+    <summary>We apply dictionary learning to Claude 3 Sonnet and find millions of interpretable features in a middle layer, demonstrating that sparse autoencoders can scale to frontier AI systems.</summary>
+    <author><name>Anthropic Research Team</name></author>
+  </entry>
+</feed>

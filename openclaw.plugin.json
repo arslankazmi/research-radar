@@ -1,0 +1,42 @@
+{
+  "id": "research-radar",
+  "name": "Research Radar",
+  "description": "Conversational, multi-source ML research radar with LLM-judged relevance that learns from in-chat 👍/👎 feedback.",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "radar_run",
+      "radar_summarize",
+      "radar_more_like",
+      "radar_explain",
+      "radar_add_interest",
+      "radar_mute",
+      "radar_sources"
+    ]
+  },
+  "toolMetadata": {
+    "radar_run": { "optional": false },
+    "radar_summarize": { "optional": true },
+    "radar_more_like": { "optional": true },
+    "radar_explain": { "optional": true },
+    "radar_add_interest": { "optional": true },
+    "radar_mute": { "optional": true },
+    "radar_sources": { "optional": true }
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "profileKey": {
+        "type": "string",
+        "description": "KV key under which the interest profile is stored (default: 'profile')."
+      },
+      "workspaceDir": {
+        "type": "string",
+        "description": "Directory for KV store files (default: workspaceDir from gateway config)."
+      }
+    }
+  }
+}

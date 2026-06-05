@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Andrej Karpathy's Blog</title>
+    <link>https://karpathy.github.io</link>
+    <description>Machine learning research and tutorials by Andrej Karpathy</description>
+    <language>en-us</language>
+    <item>
+      <title>The Unreasonable Effectiveness of Recurrent Neural Networks</title>
+      <link>https://karpathy.github.io/2015/05/21/rnn-effectiveness/</link>
+      <description>There's something magical about Recurrent Neural Networks (RNNs). I still remember when I trained my first recurrent network for Image Captioning.</description>
+      <pubDate>Thu, 21 May 2015 00:00:00 GMT</pubDate>
+      <dc:creator>Andrej Karpathy</dc:creator>
+      <category>deep-learning</category>
+      <category>rnn</category>
+    </item>
+    <item>
+      <title>A Recipe for Training Neural Networks</title>
+      <link>https://karpathy.github.io/2019/04/25/recipe/</link>
+      <description>Some four years ago I wrote a post called "Yes you should understand backprop" and argued that a solid understanding of backprop is essential.</description>
+      <pubDate>Thu, 25 Apr 2019 00:00:00 GMT</pubDate>
+      <dc:creator>Andrej Karpathy</dc:creator>
+      <category>neural-networks</category>
+      <category>training</category>
+    </item>
+    <item>
+      <title>Software 2.0</title>
+      <link>https://karpathy.medium.com/software-2-0-a64152b37c35</link>
+      <description>I sometimes see people refer to neural networks as "just another tool in your machine learning toolbox". They have some pros and cons, they work here or there.</description>
+      <pubDate>Tue, 11 Nov 2017 00:00:00 GMT</pubDate>
+      <dc:creator>Andrej Karpathy</dc:creator>
+      <category>software</category>
+    </item>
+  </channel>
+</rss>

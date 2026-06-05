@@ -1,0 +1,62 @@
+{
+  "name": "@arslankazmi/openclaw-research-radar",
+  "version": "0.1.0",
+  "description": "Conversational, multi-source ML research radar for OpenClaw — LLM-judged relevance that learns from your in-chat 👍/👎.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Arslan Kazmi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arslankazmi/research-radar"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "arxiv",
+    "research",
+    "digest",
+    "llm-judge",
+    "ml"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./pipeline": "./src/pipeline.ts"
+  },
+  "bin": {
+    "research-radar": "./src/cli.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dry-run": "tsx src/cli.ts --dry-run",
+    "radar": "tsx src/cli.ts"
+  },
+  "openclaw": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "compat": {
+      "pluginApi": ">=2026.3.24-beta.2",
+      "minGatewayVersion": "2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.3.24-beta.2",
+      "pluginSdkVersion": "2026.3.24-beta.2"
+    }
+  },
+  "dependencies": {
+    "@esbuild/darwin-arm64": "^0.28.0",
+    "esbuild": "^0.28.0",
+    "fast-xml-parser": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "engines": {
+    "node": ">=22.19"
+  }
+}

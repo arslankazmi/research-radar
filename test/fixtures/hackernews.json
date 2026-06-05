@@ -1,0 +1,41 @@
+{
+  "hits": [
+    {
+      "objectID": "39001234",
+      "title": "Show HN: I built an open-source LLM evaluation framework",
+      "url": "https://github.com/example/llm-eval",
+      "story_url": "https://github.com/example/llm-eval",
+      "points": 342,
+      "author": "hacker1",
+      "created_at": "2025-01-15T10:30:00.000Z",
+      "created_at_i": 1736940600,
+      "_tags": ["story", "author_hacker1", "story_39001234"],
+      "num_comments": 87
+    },
+    {
+      "objectID": "39002345",
+      "title": "GPT-4o achieves state-of-the-art on coding benchmarks",
+      "url": "https://openai.com/blog/gpt-4o-coding",
+      "story_url": "https://openai.com/blog/gpt-4o-coding",
+      "points": 512,
+      "author": "hacker2",
+      "created_at": "2025-01-14T14:00:00.000Z",
+      "created_at_i": 1736863200,
+      "_tags": ["story", "author_hacker2", "story_39002345"],
+      "num_comments": 234
+    },
+    {
+      "objectID": "39003456",
+      "title": "Understanding diffusion models from scratch",
+      "url": "https://lilianweng.github.io/posts/2021-07-11-diffusion-models",
+      "story_url": null,
+      "points": 287,
+      "author": "hacker3",
+      "created_at": "2025-01-13T09:00:00.000Z",
+      "created_at_i": 1736762400,
+      "_tags": ["story", "author_hacker3", "story_39003456"],
+      "num_comments": 45
+    }
+  ],
+  "nbHits": 3
+}
