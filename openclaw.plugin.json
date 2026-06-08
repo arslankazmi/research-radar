@@ -3,7 +3,8 @@
   "name": "Research Radar",
   "description": "Conversational, multi-source ML research radar with LLM-judged relevance that learns from in-chat 👍/👎 feedback.",
   "activation": {
-    "onStartup": true
+    "onStartup": false,
+    "onCommands": ["radar"]
   },
   "contracts": {
     "tools": [

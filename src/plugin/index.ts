@@ -124,7 +124,7 @@ export default definePluginEntry({
         return {
           content: [
             { type: "text", text: md },
-            { type: "json", data: card },
+            { type: "text", text: JSON.stringify(card) },
           ],
         };
       },
@@ -279,7 +279,7 @@ export default definePluginEntry({
     api.registerCommand({
       name: "radar",
       description: "Run the research radar and return today's digest.",
-      async execute(_ctx) {
+      handler: async (_ctx) => {
         try {
           const digest = await runPipeline();
           return { text: renderMarkdown(digest), continueAgent: false };
@@ -314,7 +314,7 @@ export default definePluginEntry({
         logger.error(`Failed to persist feedback for #${n}: ${String(err)}`);
       }
       // Don't claim handled — let the agent see it too
-    });
+    }, { name: "research-radar-feedback" });
 
     // ── Cron scheduling ──────────────────────────────────────────────────────
     const delivery = config.delivery;
