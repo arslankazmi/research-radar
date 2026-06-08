@@ -56,6 +56,29 @@ export function compose(
   };
 }
 
+/** Render a brief header message introducing the digest (sent as the first message). */
+export function renderDigestHeader(d: Digest): string {
+  if (d.items.length === 0) {
+    return `📡 *Research Radar* — ${d.date}\n_No items matched your interests today (${d.consideredCount} considered)._`;
+  }
+  return `📡 *Research Radar* — ${d.date}\n_${d.consideredCount} items considered, ${d.items.length} selected — react 👍/👎 on each item below to train your profile_`;
+}
+
+/** Render a single digest item as a standalone message (sent separately so users can react to it). */
+export function renderItemMessage(item: ScoredItem, n: number): string {
+  const emoji = GROUP_EMOJI[item.sourceType] ?? "🔗";
+  return [
+    `${emoji} *#${n}* *${item.title}*`,
+    item.reason,
+    `_${item.source}_ · <${item.url}|link>`,
+  ].join("\n");
+}
+
+/** Render a brief footer with available commands (sent as the last message). */
+export function renderDigestFooter(): string {
+  return "_Say `more like #N`, `mute <topic>`, or `/radar` to refresh._";
+}
+
 /**
  * Render a digest as a numbered markdown chat message.
  * Each #N references digest.items[N-1] (1-indexed).
