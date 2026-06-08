@@ -5,13 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Research Radar — an OpenClaw plugin</title>
 <meta name="description" content="A conversational, multi-source ML research radar for OpenClaw. LLM-judged relevance that learns from your in-chat 👍/👎." />
+<!-- Shared design tokens from the ak-design catalog theme. -->
+<link rel="stylesheet" href="https://arslankazmi.github.io/ak-design/dist/catalog.css?v=1" />
 <style>
+  /* Tokens (--bg, --surface, --text, fonts…) come from the catalog bundle linked above.
+     This block only sets research-radar's per-project accent (cyan) and aliases the page's
+     local variable names onto the contract so its existing rules resolve unchanged. */
   :root {
-    --bg:#0b0f14; --panel:#121821; --panel2:#0f141c; --line:#1f2733;
-    --text:#d7dde5; --muted:#8b97a7; --dim:#5c6675;
-    --cyan:#38bdf8; --green:#34d399; --blue:#1f6feb; --amber:#fbbf24; --purple:#a78bfa; --pink:#f472b6;
+    --accent:#38bdf8; --accent-2:#1f6feb;
+    --panel:var(--surface); --panel2:var(--surface-2); --line:var(--border);
+    --muted:var(--text-dim); --dim:var(--text-faint);
+    --sans:var(--font-body);
     --mono:"SFMono-Regular",ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --cyan:var(--accent); --blue:var(--accent-2);
+    --green:#34d399; --amber:#fbbf24; --purple:#a78bfa; --pink:#f472b6;
   }
   * { box-sizing:border-box; }
   html { scroll-behavior:smooth; }
@@ -332,7 +339,8 @@ openclaw plugins inspect research-radar --runtime --json</pre></div>
       <div>
         <a href="https://github.com/arslankazmi/research-radar">GitHub</a> ·
         <a href="https://github.com/openclaw/openclaw">OpenClaw</a> ·
-        <a href="https://github.com/arslankazmi/research-radar/blob/main/docs/LOCAL_TESTING.md">Local testing</a>
+        <a href="https://github.com/arslankazmi/research-radar/blob/main/docs/LOCAL_TESTING.md">Local testing</a> ·
+        <a href="https://arslankazmi.github.io/portfolio/">↩ Catalog</a>
       </div>
     </div>
     <div class="disclaimer">Independent, unofficial plugin — not affiliated with or endorsed by OpenClaw or any listed source (arXiv, Hugging Face, GitHub, Hacker News, or the researcher blogs). Diagram and traces are generated from the real codebase; the chat panel is an illustration of wired behaviour.</div>
