@@ -17,7 +17,7 @@ import { defaultConfig } from "../config.default.js";
 import { loadProfile, saveProfile, addInterest, muteTopic } from "../profile/profile.js";
 import { applyReaction, parseReaction } from "../feedback/feedback.js";
 import { runRadar } from "../pipeline.js";
-import { renderMarkdown, renderCanvasCard } from "../digest/compose.js";
+import { renderMarkdown, renderCanvasCard, renderDigestHeader, renderItemMessage, renderDigestFooter } from "../digest/compose.js";
 import { fsKv } from "../runtime/fs-kv.js";
 import type { Llm, LlmRequest, Logger } from "../contracts.js";
 import type { Digest, ScoredItem } from "../types.js";
@@ -111,7 +111,9 @@ export default definePluginEntry({
     api.registerTool({
       name: "radar_run",
       description:
-        "Fetch, score, and return today's ML research digest. Returns a numbered Markdown digest + Canvas card.",
+        "Fetch, score, and return today's ML research digest. " +
+        "Returns multiple content blocks: a header, one block per item, and a footer. " +
+        "IMPORTANT: send each content block as a SEPARATE Slack message so users can react (👍/👎) to individual items.",
       parameters: {
         type: "object",
         properties: {},
@@ -119,14 +121,25 @@ export default definePluginEntry({
       },
       async execute(_id, _params) {
         const digest = await runPipeline();
-        const md = renderMarkdown(digest);
         const card = renderCanvasCard(digest);
-        return {
-          content: [
-            { type: "text", text: md },
-            { type: "text", text: JSON.stringify(card) },
-          ],
-        };
+
+        const parts: { type: "text"; text: string }[] = [];
+
+        // Header message
+        parts.push({ type: "text", text: renderDigestHeader(digest) });
+
+        // One message per item
+        digest.items.forEach((item, i) => {
+          parts.push({ type: "text", text: renderItemMessage(item, i + 1) });
+        });
+
+        // Footer message
+        parts.push({ type: "text", text: renderDigestFooter() });
+
+        // Canvas card (not sent as chat message)
+        parts.push({ type: "text", text: JSON.stringify(card) });
+
+        return { content: parts };
       },
     });
 
@@ -278,11 +291,22 @@ export default definePluginEntry({
     // ── /radar command ──────────────────────────────────────────────────────
     api.registerCommand({
       name: "radar",
-      description: "Run the research radar and return today's digest.",
+      description:
+        "Run the research radar and return today's digest. " +
+        "Send each returned content block as a SEPARATE Slack message so users can react (👍/👎) to individual items.",
       handler: async (_ctx) => {
         try {
           const digest = await runPipeline();
-          return { text: renderMarkdown(digest), continueAgent: false };
+          // Return header only; the agent uses radar_run tool for full per-item delivery
+          const header = renderDigestHeader(digest);
+          const items = digest.items
+            .map((item, i) => renderItemMessage(item, i + 1))
+            .join("\n\n---\n\n");
+          const footer = renderDigestFooter();
+          return {
+            text: [header, items, footer].filter(Boolean).join("\n\n---\n\n"),
+            continueAgent: true,
+          };
         } catch (err) {
           return { text: `Research radar failed: ${String(err)}`, continueAgent: false };
         }
