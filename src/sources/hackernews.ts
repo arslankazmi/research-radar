@@ -33,7 +33,8 @@ export function createHackerNewsAdapter(cfg: SourceConfig, deps: SourceDeps): So
   const minPoints = opts.minPoints ?? 100;
 
   const encodedQuery = encodeURIComponent(query);
-  const url = `https://hn.algolia.com/api/v1/search_by_date?query=${encodedQuery}&tags=${tags}&numericFilters=points>=${minPoints}`;
+  const encodedFilter = encodeURIComponent(`points>=${minPoints}`);
+  const url = `https://hn.algolia.com/api/v1/search_by_date?query=${encodedQuery}&tags=${tags}&numericFilters=${encodedFilter}`;
 
   return {
     id: cfg.id,

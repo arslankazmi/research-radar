@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, rename, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import type { KvStore } from "../contracts.js";
 
@@ -32,7 +32,11 @@ export function fsKv(dir: string): KvStore {
       // Ensure directory exists (mkdir -p)
       await mkdir(dir, { recursive: true });
       const path = await keyPath(key);
-      await writeFile(path, JSON.stringify(value, null, 2), "utf-8");
+      // Write to a temp file then rename for atomicity — prevents partial writes
+      // from corrupting the live file if two writes race or the process crashes.
+      const tmp = `${path}.tmp`;
+      await writeFile(tmp, JSON.stringify(value, null, 2), "utf-8");
+      await rename(tmp, path);
     },
   };
 }
